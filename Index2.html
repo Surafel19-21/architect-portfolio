@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Abel & Co</title>
+    <style>
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================
+           Same as index.html - removes default spacing
+           and sets up the foundation.
+        */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f05 100%);
+            color: #fff6ed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* min-height: 100vh ensures full screen height even if content is small */
+        }
+
+        /* ============================================
+           LOGIN CONTAINER
+           ============================================
+           The card that holds the login form.
+           box-shadow: subtle depth effect
+           backdrop-filter: blur effect behind the card (modern glass-morphism)
+        */
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, rgba(20, 15, 10, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%);
+            border: 1px solid rgba(255, 246, 237, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            text-align: center;
+        }
+
+        /* ============================================
+           LOGO / BRAND NAME
+           ============================================
+           Company name at the top of the login form.
+        */
+
+        .logo {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: #fff6ed;
+        }
+
+        .tagline {
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: rgba(255, 246, 237, 0.5);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        /* ============================================
+           FORM ELEMENTS
+           ============================================
+           Styling for input fields and buttons.
+        */
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            /* text-align: left aligns label text to the left */
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: rgba(255, 246, 237, 0.7);
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 246, 237, 0.05);
+            border: 1px solid rgba(255, 246, 237, 0.2);
+            border-radius: 6px;
+            color: #fff6ed;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            /* font-family: inherit font from parent */
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            /* Remove default blue outline */
+            background: rgba(255, 246, 237, 0.1);
+            border-color: rgba(255, 246, 237, 0.4);
+            box-shadow: 0 0 0 3px rgba(255, 246, 237, 0.1);
+            /* box-shadow creates a glow effect on focus */
+        }
+
+        input::placeholder {
+            color: rgba(255, 246, 237, 0.3);
+        }
+
+        /* ============================================
+           LOGIN BUTTON
+           ============================================
+           Primary call-to-action button.
+        */
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8b6f47 0%, #6b5a3a 100%);
+            /* Gradient from light bronze to dark bronze */
+            border: none;
+            border-radius: 6px;
+            color: #fff6ed;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            /* Move up slightly on hover */
+            box-shadow: 0 10px 30px rgba(139, 111, 71, 0.3);
+            /* Add shadow beneath button */
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+            /* Return to normal position when clicked */
+        }
+
+        .login-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            /* Show disabled state */
+        }
+
+        /* ============================================
+           ERROR MESSAGES
+           ============================================
+           Display errors in red if login fails.
+        */
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+            /* display: none hides it by default */
+            text-align: left;
+        }
+
+        .error-message.show {
+            display: block;
+            /* Show it when 'show' class is added */
+        }
+
+        /* ============================================
+           SUCCESS STATE
+           ============================================
+           Show when login is successful.
+        */
+
+        .success-message {
+            color: #90ee90;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================
+           Adjust for mobile screens.
+        */
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 20px;
+                padding: 40px 25px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            .login-btn {
+                font-size: 16px;
+                /* Larger on mobile for easier touch */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- BRAND NAME -->
+        <div class="logo">Abel & Co</div>
+        <div class="tagline">Admin Portal</div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm">
+            <!-- EMAIL/USERNAME FIELD -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="text"
+                    id="email"
+                    placeholder="admin@example.com"
+                    required
+                    /* required: field must be filled before submitting */
+                >
+            </div>
+
+            <!-- PASSWORD FIELD -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="••••••••"
+                    required
+                >
+            </div>
+
+            <!-- ERROR MESSAGE (shown when login fails) -->
+            <div class="error-message" id="errorMessage"></div>
+            
+            <!-- SUCCESS MESSAGE (shown when login succeeds) -->
+            <div class="success-message" id="successMessage">Login successful! Redirecting...</div>
+
+            <!-- LOGIN BUTTON -->
+            <button type="submit" class="login-btn" id="loginBtn">
+                Login
+            </button>
+        </form>
+    </div>
+
+    <script>
+        /* ============================================
+           HARDCODED CREDENTIALS (FOR DEMO)
+           ============================================
+           ⚠️  IN PRODUCTION, NEVER hardcode passwords!
+           This is just for demonstration.
+           
+           In a real app, you would:
+           1. Have a backend server check credentials
+           2. Send username/password to server
+           3. Server validates against a database
+           4. Server returns a secure token
+           5. Frontend stores token for future requests
+        */
+
+        const ADMIN_EMAIL = 'admin@surafel.com';
+        const ADMIN_PASSWORD = 'architect2024';
+        /* CHANGE THESE TO YOUR OWN CREDENTIALS! */
+
+        // Get DOM elements
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loginBtn = document.getElementById('loginBtn');
+
+        /* ============================================
+           FORM SUBMISSION HANDLER
+           ============================================
+           When user clicks "Login", this function runs.
+        */
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            /* e.preventDefault() stops the form from doing its default
+               action (which is to reload the page) */
+
+            // Clear previous messages
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+
+            // Get input values
+            const email = emailInput.value.trim();
+            /* .trim() removes whitespace from start/end */
+            const password = passwordInput.value;
+
+            // Validate (basic check)
+            if (!email || !password) {
+                showError('Please enter both email and password.');
+                return;
+                /* return exits the function early */
+            }
+
+            // Disable button while processing
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+
+            // Simulate network delay (in real app, this would be an API call)
+            setTimeout(() => {
+                // Check credentials
+                if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                    // Login successful!
+                    successMessage.classList.add('show');
+                    
+                    // Store login token in localStorage
+                    // localStorage persists even after closing the browser
+                    localStorage.setItem('adminToken', 'authenticated');
+                    
+                    // Redirect to admin page after 1 second
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                        /* window.location.href = navigate to new page */
+                    }, 1000);
+                } else {
+                    // Login failed
+                    showError('Invalid email or password.');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Login';
+                }
+            }, 500);
+            /* setTimeout(function, delay in milliseconds)
+               runs the function after 500ms delay */
+        });
+
+        /* ============================================
+           HELPER FUNCTION: SHOW ERROR
+           ============================================
+           Displays error message to user.
+        */
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            /* Add 'show' class to make it visible */
+        }
+
+        /* ============================================
+           CHECK IF ALREADY LOGGED IN
+           ============================================
+           If user visits this page but is already logged in,
+           redirect them to admin.html automatically.
+        */
+
+        window.addEventListener('DOMContentLoaded', () => {
+            /* DOMContentLoaded fires when page finishes loading */
+            
+            if (localStorage.getItem('adminToken')) {
+                /* If token exists, they're already logged in */
+                window.location.href = 'admin.html';
+            }
+        });
+    </script>
+</body>
+</html>
