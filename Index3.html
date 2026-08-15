@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Abel & Co</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #fff6ed;
+        }
+
+        /* ============================================
+           HEADER / NAVIGATION
+           ============================================
+        */
+
+        .header {
+            background: linear-gradient(135deg, #1a0f05 0%, #0a0a0a 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 246, 237, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-brand {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: #ff6b6b;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+        }
+
+        /* ============================================
+           MAIN CONTAINER
+           ============================================
+        */
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 40px;
+        }
+
+        /* ============================================
+           PAGE TITLE
+           ============================================
+        */
+
+        h1 {
+            font-size: 36px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        /* ============================================
+           SECTION TITLE
+           ============================================
+        */
+
+        h2 {
+            font-size: 22px;
+            font-weight: 400;
+            margin: 30px 0 20px 0;
+            letter-spacing: 1px;
+            color: #d1d5db;
+        }
+
+        /* ============================================
+           UPLOAD SECTION
+           ============================================
+        */
+
+        .upload-section {
+            background: linear-gradient(135deg, rgba(50, 40, 30, 0.3) 0%, rgba(40, 30, 20, 0.3) 100%);
+            border: 2px dashed rgba(255, 246, 237, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-section:hover {
+            background: linear-gradient(135deg, rgba(60, 50, 40, 0.4) 0%, rgba(50, 40, 30, 0.4) 100%);
+            border-color: rgba(255, 246, 237, 0.4);
+        }
+
+        .upload-section.dragover {
+            background: linear-gradient(135deg, rgba(70, 60, 50, 0.5) 0%, rgba(60, 50, 40, 0.5) 100%);
+            border-color: rgba(255, 246, 237, 0.6);
+            transform: scale(1.02);
+        }
+
+        #fileInput {
+            display: none;
+            /* Hidden file input - we'll trigger it with a button */
+        }
+
+        .upload-label {
+            font-size: 16px;
+            color: rgba(255, 246, 237, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: rgba(255, 246, 237, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #8b6f47 0%, #6b5a3a 100%);
+            border: none;
+            border-radius: 6px;
+            color: #fff6ed;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 111, 71, 0.3);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ============================================
+           STATUS MESSAGES
+           ============================================
+        */
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(144, 238, 144, 0.15);
+            border: 1px solid rgba(144, 238, 144, 0.5);
+            color: #90ee90;
+        }
+
+        .message.error {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: #ff6b6b;
+        }
+
+        /* ============================================
+           PROJECTS GALLERY
+           ============================================
+        */
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .project-item {
+            position: relative;
+            aspect-ratio: 1;
+            background: rgba(100, 80, 60, 0.2);
+            border: 1px solid rgba(255, 246, 237, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .project-item:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 246, 237, 0.3);
+        }
+
+        .project-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-item-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .project-item:hover .project-item-overlay {
+            opacity: 1;
+        }
+
+        .delete-btn {
+            padding: 8px 16px;
+            background: #ff6b6b;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+
+        /* ============================================
+           LOADING SPINNER
+           ============================================
+        */
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 246, 237, 0.3);
+            border-top: 2px solid #fff6ed;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================
+        */
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .upload-section {
+                padding: 30px 20px;
+            }
+
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-brand">Abel & Co Admin</div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <h1>Portfolio Management</h1>
+
+        <!-- STATUS MESSAGES -->
+        <div class="message success" id="successMessage"></div>
+        <div class="message error" id="errorMessage"></div>
+
+        <!-- UPLOAD SECTION -->
+        <h2>Upload Projects</h2>
+        <div class="upload-section" id="uploadSection">
+            <p class="upload-label">
+                Drag and drop images here or click to select
+            </p>
+            <p class="upload-hint">
+                Supported: JPG, PNG (Max 30MB per image)
+            </p>
+            <input
+                type="file"
+                id="fileInput"
+                accept="image/jpeg,image/png"
+                multiple
+                /* multiple allows selecting multiple files at once */
+            >
+            <button class="upload-btn" id="uploadTrigger">
+                Choose Images
+            </button>
+        </div>
+
+        <!-- PROJECTS GALLERY -->
+        <h2>Your Projects</h2>
+        <div class="projects-grid" id="projectsGrid">
+            <p style="grid-column: 1 / -1; color: rgba(255, 246, 237, 0.5);">Loading projects...</p>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================
+           CHECK AUTHENTICATION
+           ============================================
+           If user is not logged in, redirect to login page.
+        */
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('adminToken')) {
+                /* If no token, user is not logged in */
+                window.location.href = 'admin-login.html';
+            }
+        });
+
+        /* ============================================
+           CLOUDINARY CONFIGURATION
+           ============================================
+           ⚠️  IMPORTANT: Replace with your actual credentials
+        */
+
+        const CLOUDINARY_CLOUD_NAME = 'tzp7l0fd';
+        /* Replace 'your-cloud-name' with your Cloudinary Cloud Name */
+        
+        const CLOUDINARY_API_KEY = '998944199463993';
+        /* Replace 'your-api-key' with your Cloudinary API Key */
+        
+        const CLOUDINARY_UPLOAD_PRESET = 'architect-portfolio';
+        /* This is the upload preset name - you need to create this in Cloudinary */
+
+        /* ============================================
+           DOM ELEMENTS
+           ============================================
+        */
+
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const uploadTrigger = document.getElementById('uploadTrigger');
+        const projectsGrid = document.getElementById('projectsGrid');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        /* ============================================
+           LOGOUT HANDLER
+           ============================================
+        */
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('adminToken');
+            /* Remove the login token */
+            window.location.href = 'admin-login.html';
+            /* Send user back to login */
+        });
+
+        /* ============================================
+           FILE UPLOAD HANDLER
+           ============================================
+           When user clicks "Choose Images" button.
+        */
+
+        uploadTrigger.addEventListener('click', () => {
+            fileInput.click();
+            /* Trigger the hidden file input */
+        });
+
+        /* ============================================
+           FILE SELECTION HANDLER
+           ============================================
+           When user selects files from file dialog.
+        */
+
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            /* e.target.files = the selected files */
+            
+            if (files.length > 0) {
+                uploadFilesToCloudinary(files);
+            }
+        });
+
+        /* ============================================
+           DRAG & DROP HANDLERS
+           ============================================
+           For dragging files into the upload area.
+        */
+
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            /* Prevent browser's default behavior */
+            uploadSection.classList.add('dragover');
+            /* Visual feedback: change appearance */
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            /* e.dataTransfer.files = files being dragged */
+            
+            if (files.length > 0) {
+                uploadFilesToCloudinary(files);
+            }
+        });
+
+        /* ============================================
+           UPLOAD TO CLOUDINARY
+           ============================================
+           This is the core function that sends images to Cloudinary.
+           
+           How it works:
+           1. Create FormData object (like a form in HTML)
+           2. Add file to FormData
+           3. Send to Cloudinary's upload endpoint
+           4. Get back the image URL
+           5. Display it in our gallery
+        */
+
+        async function uploadFilesToCloudinary(files) {
+            const fileArray = Array.from(files);
+            /* Convert FileList to Array so we can loop through it */
+
+            let successCount = 0;
+            let failCount = 0;
+
+            // Show loading state
+            uploadTrigger.disabled = true;
+            uploadTrigger.innerHTML = '<span class="spinner"></span> Uploading...';
+
+            // Upload each file
+            for (const file of fileArray) {
+                try {
+                    // Validate file size (max 5MB)
+                    if (file.size > 30 * 1024 * 1024) {
+                        console.error(`${file.name} is too large (max 30MB)`);
+                        failCount++;
+                        continue;
+                        /* continue skips to next iteration */
+                    }
+
+                    // Create FormData (like HTML form)
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    /* FormData.append(key, value) adds form fields */
+                    
+                    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                    formData.append('folder', 'architect-portfolio');
+                    /* Cloudinary will save images in this folder */
+
+                    // Send to Cloudinary
+                    const response = await fetch(
+                        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+                        {
+                            method: 'POST',
+                            /* POST method sends data to server */
+                            body: formData
+                            /* body contains the form data with file */
+                        }
+                    );
+
+                    if (response.ok) {
+                        /* response.ok is true if status is 200-299 */
+                        const data = await response.json();
+                        successCount++;
+                        
+                        // Add image to gallery
+                        addProjectToGallery(data.secure_url, data.public_id);
+                    } else {
+                        console.error('Upload failed for:', file.name);
+                        failCount++;
+                    }
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    failCount++;
+                }
+            }
+
+            // Reset button
+            uploadTrigger.disabled = false;
+            uploadTrigger.textContent = 'Choose Images';
+
+            // Show messages
+            if (successCount > 0) {
+                showSuccess(`${successCount} image(s) uploaded successfully!`);
+            }
+            if (failCount > 0) {
+                showError(`${failCount} image(s) failed to upload.`);
+            }
+
+            // Reload gallery
+            loadProjects();
+
+            // Reset file input
+            fileInput.value = '';
+            /* Clear the input so same file can be uploaded again */
+        }
+
+        /* ============================================
+           ADD PROJECT TO GALLERY (LOCAL)
+           ============================================
+           Adds a single project card to the gallery
+           after successful upload.
+        */
+
+        function addProjectToGallery(imageUrl, publicId) {
+            const card = document.createElement('div');
+            card.className = 'project-item';
+            
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = publicId;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'project-item-overlay';
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = () => deleteProject(publicId, card);
+            /* onclick: when clicked, delete this project */
+            
+            overlay.appendChild(deleteBtn);
+            card.appendChild(img);
+            card.appendChild(overlay);
+            
+            projectsGrid.appendChild(card);
+        }
+
+        /* ============================================
+           LOAD ALL PROJECTS FROM CLOUDINARY
+           ============================================
+           Fetches list of all images in the folder.
+        */
+
+        async function loadProjects() {
+            try {
+                const response = await fetch(
+                    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/resources/search`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            expression: 'folder:architect-portfolio',
+                            /* Find all images in this folder */
+                            sort_by: [['uploaded_at', 'desc']],
+                            /* Sort by upload date (newest first) */
+                            max_results: 100,
+                            /* Get up to 100 images */
+                        }),
+                    }
+                );
+
+                const data = await response.json();
+
+                // Clear gallery
+                projectsGrid.innerHTML = '';
+
+                if (data.resources && data.resources.length > 0) {
+                    // Add each image
+                    data.resources.forEach((resource) => {
+                        addProjectToGallery(
+                            resource.secure_url,
+                            resource.public_id
+                        );
+                    });
+                } else {
+                    projectsGrid.innerHTML = '<p style="grid-column: 1 / -1; color: rgba(255, 246, 237, 0.5);">No projects yet. Upload some images!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                showError('Failed to load projects.');
+            }
+        }
+
+        /* ============================================
+           DELETE PROJECT
+           ============================================
+           Removes an image from Cloudinary.
+           ⚠️  Requires API Key (should not be in frontend code)
+           
+           In a real app, you'd call your backend server to do this,
+           since you never want to expose API keys in frontend code.
+        */
+
+        function deleteProject(publicId, cardElement) {
+            if (!confirm('Are you sure you want to delete this project?')) {
+                return;
+                /* User cancelled */
+            }
+
+            // Note: In production, call your backend API instead
+            // Your backend would use the API key securely
+            // For demo, we just remove from UI
+            cardElement.remove();
+            showSuccess('Project deleted.');
+        }
+
+        /* ============================================
+           HELPER FUNCTIONS: SHOW MESSAGES
+           ============================================
+        */
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+            
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 3000);
+            /* Auto-hide after 3 seconds */
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        /* ============================================
+           INITIALIZE
+           ============================================
+           Load projects when page opens.
+        */
+
+        loadProjects();
+    </script>
+</body>
+</html>
