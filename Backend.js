@@ -18,6 +18,8 @@
    require() loads external libraries/modules.
    These must be installed via npm first.
 */
+require('dotenv').config();
+
 
 const express = require('express');
 /* Express = lightweight web framework for Node.js
