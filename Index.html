@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abel & Co - Architecture Portfolio</title>
+    <style>
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================
+           This section removes all default browser styling
+           and sets up the foundation for the entire page.
+        */
+
+        * {
+            margin: 0;              /* Remove default spacing around all elements */
+            padding: 0;             /* Remove default padding inside all elements */
+            box-sizing: border-box;  /* Make width/height include borders and padding */
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            /* Font: Use 'Outfit' if available, otherwise use system fonts */
+            background: #0a0a0a;     /* Very dark background (almost black) */
+            color: #fff6ed;          /* Light cream text color */
+            overflow: hidden;        /* Hide scrollbars - we swipe instead of scroll */
+            position: relative;
+        }
+
+        /* ============================================
+           MAIN CONTAINER
+           ============================================
+           This is the wrapper that holds everything visible.
+           position: relative means child elements can be positioned
+           absolutely within it.
+        */
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============================================
+           BACKGROUND WITH GEOMETRIC SHAPES
+           ============================================
+           Creates the cinematic background effect with
+           abstract architectural forms.
+        */
+
+        .webgl-bg {
+            position: absolute;  /* Stays in place while content moves over it */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;          /* Behind slides (which are z-index 10+) */
+            background: linear-gradient(45deg, #1a0f05 0%, #0a0a0a 50%, #0f1520 100%);
+            /* Gradient: bronze → dark → blue for luxury feel */
+            opacity: 0.7;
+        }
+
+        .geometric-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .geometric-shapes svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ============================================
+           HEADER (FIXED AT TOP)
+           ============================================
+           Brand name and navigation buttons that stay visible
+           while slides change.
+        */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;  /* Brand left, buttons right */
+            align-items: center;
+            z-index: 50;                     /* Above slides */
+            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.8), transparent);
+            /* Gradient fades from dark to transparent */
+        }
+
+        .brand {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;         /* Makes it circular */
+            background: rgba(255, 246, 237, 0.1);  /* Slight transparency */
+            border: 1px solid rgba(255, 246, 237, 0.2);
+            color: #fff6ed;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;  /* Smooth hover animation */
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 246, 237, 0.2);
+            border-color: rgba(255, 246, 237, 0.4);
+        }
+
+        /* ============================================
+           SLIDE COUNTER (SIDE LABEL)
+           ============================================
+           Shows current slide number (e.g., "01 / 07")
+        */
+
+        .slide-label {
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);  /* Center vertically */
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 246, 237, 0.4);
+            z-index: 30;
+        }
+
+        /* ============================================
+           SLIDES CONTAINER & INDIVIDUAL SLIDES
+           ============================================
+           This is where the magic happens. Each slide:
+           - Starts off-screen to the right (translateX(100%))
+           - Transitions smoothly (opacity, transform)
+           - Active slide moves into view (translateX(0))
+        */
+
+        .slides-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;           /* Clip content outside boundaries */
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;      /* Stack children vertically */
+            padding: 60px;
+            text-align: center;
+            opacity: 0;                  /* Start invisible */
+            transform: translateX(100%); /* Start off-screen right */
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            z-index: 10;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 15, 10, 0.95) 100%);
+            /* Semi-transparent overlay so we can see background */
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);    /* Slide into view */
+            z-index: 20;                 /* Bring to front */
+        }
+
+        .slide.prev {
+            transform: translateX(-100%); /* Previous slides go left */
+        }
+
+        .slide h1 {
+            font-size: 72px;
+            font-weight: 300;            /* Light weight for luxury feel */
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .slide p {
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 1.8;
+            max-width: 800px;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+
+        /* ============================================
+           PROJECT GRID LAYOUT
+           ============================================
+           Used on the "Projects" slide to display
+           multiple project cards in a 3-column grid.
+        */
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);  /* 3 equal columns */
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .project-card {
+            aspect-ratio: 1;             /* Square cards */
+            background: linear-gradient(135deg, rgba(100, 80, 60, 0.3) 0%, rgba(70, 50, 30, 0.3) 100%);
+            border: 1px solid rgba(255, 246, 237, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #b0a090;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            background: linear-gradient(135deg, rgba(120, 100, 80, 0.4) 0%, rgba(90, 70, 50, 0.4) 100%);
+            border-color: rgba(255, 246, 237, 0.3);
+            transform: scale(1.05);      /* Slightly enlarge on hover */
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;           /* Crop image to fit card */
+            border-radius: 8px;
+        }
+
+        /* ============================================
+           NAVIGATION DOTS (BOTTOM CENTER)
+           ============================================
+           Clickable dots showing which slide you're on.
+           Active dot is larger and fully visible.
+        */
+
+        .nav-dots {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);  /* Center horizontally */
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 246, 237, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #fff6ed;
+            transform: scale(1.3);       /* Grow larger when active */
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================
+           Keyframes define how elements move over time.
+           This "float" animation makes shapes bob up/down.
+        */
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);  /* Move up 20px at midpoint */
+            }
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN (MOBILE)
+           ============================================
+           These styles apply only on smaller screens
+           (max-width: 768px = tablet/mobile).
+        */
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 30px;
+            }
+
+            .slide {
+                padding: 40px 20px;
+            }
+
+            .slide h1 {
+                font-size: 48px;
+            }
+
+            .slide p {
+                font-size: 16px;
+            }
+
+            .project-grid {
+                grid-template-columns: repeat(2, 1fr);  /* 2 columns on mobile */
+                gap: 15px;
+            }
+
+            .slide-label {
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- BACKGROUND: Geometric shapes for cinematic effect -->
+        <div class="webgl-bg">
+            <div class="geometric-shapes" id="shapes"></div>
+        </div>
+
+        <!-- HEADER: Brand and navigation buttons -->
+        <div class="header">
+            <div class="brand">Abel & Co</div>
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prev-btn" aria-label="Previous slide">←</button>
+                <button class="nav-btn" id="next-btn" aria-label="Next slide">→</button>
+            </div>
+        </div>
+
+        <!-- SLIDE COUNTER: Shows "01 / 07" etc -->
+        <div class="slide-label" id="slideLabel">01 / 07</div>
+
+        <!-- SLIDES CONTAINER: All 7 slides -->
+        <div class="slides-wrapper" id="slidesWrapper">
+            <!-- SLIDE 1: Title/Hero -->
+            <div class="slide active">
+                <h1>Architectural<br>Visions</h1>
+                <p>Transforming spaces, shaping futures. Explore our portfolio of innovative architectural designs.</p>
+            </div>
+
+            <!-- SLIDE 2: Projects Grid -->
+            <div class="slide">
+                <h1>Projects</h1>
+                <div class="project-grid" id="projectGrid">
+                    <!-- Projects loaded from Cloudinary via JavaScript -->
+                </div>
+            </div>
+
+            <!-- SLIDE 3: Case Study -->
+            <div class="slide">
+                <h1>Case Study<br>Residential Tower</h1>
+                <p>A 42-story sustainable residential tower featuring innovative climate-responsive facades and community spaces.</p>
+            </div>
+
+            <!-- SLIDE 4: Testimonials -->
+            <div class="slide">
+                <h1>Testimonials</h1>
+                <p>"Abel & Co transformed our vision into reality. Their attention to detail is exceptional." – Client Testimonial</p>
+            </div>
+
+            <!-- SLIDE 5: Blog -->
+            <div class="slide">
+                <h1>Blog & Insights</h1>
+                <p>Explore our latest thoughts on sustainable architecture, design trends, and the future of urban spaces.</p>
+            </div>
+
+            <!-- SLIDE 6: Services -->
+            <div class="slide">
+                <h1>Services</h1>
+                <p>Custom architectural designs, 3D visualization, project management, and consulting for your vision.</p>
+            </div>
+
+            <!-- SLIDE 7: Contact -->
+            <div class="slide">
+                <h1>Get In Touch</h1>
+                <p>Ready to start your project? Contact us today for a consultation.</p>
+            </div>
+        </div>
+
+        <!-- NAVIGATION DOTS: Click to jump to slides -->
+        <div class="nav-dots" id="navDots"></div>
+    </div>
+
+    <script>
+        /* ============================================
+           CONFIGURATION & GLOBAL VARIABLES
+           ============================================
+           These variables track the state of the page.
+        */
+
+        const TOTAL_SLIDES = 7;
+        let currentSlide = 0;      /* Which slide we're on (0-6) */
+        let touchStartX = 0;       /* Where touch started (for swipe detection) */
+        let touchEndX = 0;         /* Where touch ended */
+
+        // CLOUDINARY CONFIGURATION
+        // ⚠️  REPLACE 'your-cloud-name' WITH YOUR ACTUAL CLOUDINARY CLOUD NAME
+        const CLOUDINARY_CLOUD_NAME = 'tzp7l0fd';
+        const CLOUDINARY_FOLDER = 'architect-portfolio';  /* Folder in Cloudinary */
+
+        /* ============================================
+           DOM ELEMENTS (GETTING REFERENCES)
+           ============================================
+           We get references to HTML elements so we can
+           manipulate them with JavaScript.
+           document.getElementById() finds elements by their id.
+        */
+
+        const slidesWrapper = document.getElementById('slidesWrapper');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const navDots = document.getElementById('navDots');
+        const slideLabel = document.getElementById('slideLabel');
+        const shapesContainer = document.getElementById('shapes');
+        const projectGrid = document.getElementById('projectGrid');
+
+        /* ============================================
+           INITIALIZE NAVIGATION DOTS
+           ============================================
+           Creates 7 clickable dots at the bottom.
+           Each dot is clickable and jumps to that slide.
+        */
+
+        function initDots() {
+            for (let i = 0; i < TOTAL_SLIDES; i++) {
+                const dot = document.createElement('div');
+                /* createElement('div') creates a new <div> element in memory */
+                
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                /* Add 'dot' class to all, add 'active' only to first one */
+                
+                dot.onclick = () => goToSlide(i);
+                /* When clicked, go to slide i */
+                
+                navDots.appendChild(dot);
+                /* Add the dot to the navDots container */
+            }
+        }
+
+        /* ============================================
+           UPDATE SLIDES DISPLAY
+           ============================================
+           This function is called whenever we change slides.
+           It updates:
+           - Which slide has the 'active' class (visible)
+           - Which dot is highlighted
+           - The slide counter text
+        */
+
+        function updateSlides() {
+            // Get all slide elements
+            const slides = document.querySelectorAll('.slide');
+            
+            slides.forEach((slide, i) => {
+                // Remove both active and prev classes first
+                slide.classList.remove('active', 'prev');
+                
+                if (i === currentSlide) {
+                    // This is the current slide
+                    slide.classList.add('active');
+                    /* When a slide has 'active' class:
+                       - opacity becomes 1 (fully visible)
+                       - transform becomes translateX(0) (moves into view)
+                    */
+                } else if (i < currentSlide) {
+                    // Slides we've already passed
+                    slide.classList.add('prev');
+                    /* When a slide has 'prev' class:
+                       - transform becomes translateX(-100%) (moves left)
+                    */
+                }
+            });
+
+            // Update navigation dots
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+                /* toggle adds/removes a class depending on condition */
+            });
+
+            // Update slide counter (e.g., "01 / 07")
+            slideLabel.textContent = `${String(currentSlide + 1).padStart(2, '0')} / ${TOTAL_SLIDES}`;
+            /* String.padStart(2, '0') turns 1 into "01" */
+        }
+
+        /* ============================================
+           NAVIGATE TO SPECIFIC SLIDE
+           ============================================
+           This function is called when you want to jump
+           to a specific slide number.
+           The modulo (%) operator wraps around:
+           - If you go past slide 6, it loops to 0
+           - If you go before slide 0, it loops to 6
+        */
+
+        function goToSlide(n) {
+            currentSlide = (n + TOTAL_SLIDES) % TOTAL_SLIDES;
+            /* % (modulo) ensures currentSlide is always 0-6 */
+            updateSlides();
+        }
+
+        /* ============================================
+           NEXT AND PREVIOUS SLIDE FUNCTIONS
+           ============================================
+           These are simple wrappers around goToSlide()
+           that add or subtract 1 from currentSlide.
+        */
+
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+
+        /* ============================================
+           BUTTON CLICK HANDLERS
+           ============================================
+           When user clicks the arrow buttons,
+           these functions run.
+        */
+
+        prevBtn.onclick = prevSlide;
+        nextBtn.onclick = nextSlide;
+
+        /* ============================================
+           TOUCH SWIPE HANDLERS (FOR MOBILE)
+           ============================================
+           When you swipe your finger:
+           1. touchstart fires - we record where you started (touchStartX)
+           2. touchend fires - we record where you ended (touchEndX)
+           3. We compare: if you swiped > 50px, go to next/prev
+        */
+
+        slidesWrapper.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            /* changedTouches[0] = first finger touching screen */
+            /* .screenX = X coordinate of that touch */
+        });
+
+        slidesWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            
+            // Swipe left (start > end) = next slide
+            if (touchStartX - touchEndX > 50) {
+                nextSlide();
+            }
+            
+            // Swipe right (end > start) = previous slide
+            if (touchEndX - touchStartX > 50) {
+                prevSlide();
+            }
+        });
+
+        /* ============================================
+           KEYBOARD NAVIGATION
+           ============================================
+           Arrow keys also work for navigation.
+           - Right arrow = next slide
+           - Left arrow = previous slide
+        */
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        /* ============================================
+           LOAD PROJECTS FROM CLOUDINARY
+           ============================================
+           This function fetches images from Cloudinary
+           and displays them in the project grid.
+           
+           How it works:
+           1. Uses Cloudinary's Search API
+           2. Finds all images in the architect-portfolio folder
+           3. Creates <img> elements for each
+           4. Adds them to the project grid
+        */
+
+        async function loadProjectsFromCloudinary() {
+            try {
+                /* async/await allows us to wait for data from the internet */
+                
+                const response = await fetch(
+                    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/resources/search`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            expression: `folder:${CLOUDINARY_FOLDER}`,
+                            /* Find images in our folder */
+                            max_results: 6,
+                            /* Limit to 6 images for demo */
+                        }),
+                    }
+                );
+
+                const data = await response.json();
+                /* Convert response to JavaScript object */
+
+                if (data.resources && data.resources.length > 0) {
+                    // Clear the grid first
+                    projectGrid.innerHTML = '';
+                    
+                    // Add each image as a project card
+                    data.resources.forEach((resource) => {
+                        const card = document.createElement('div');
+                        card.className = 'project-card';
+                        
+                        const img = document.createElement('img');
+                        img.src = resource.secure_url;
+                        /* secure_url is the HTTPS link to the image */
+                        img.alt = resource.public_id;
+                        /* public_id is the image's filename */
+                        
+                        card.appendChild(img);
+                        projectGrid.appendChild(card);
+                    });
+                } else {
+                    // If no images found, show placeholder
+                    projectGrid.innerHTML = '<p style="color: #b0a090; grid-column: 1 / -1;">No projects uploaded yet. Visit the admin panel to add projects.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                projectGrid.innerHTML = '<p style="color: #b0a090; grid-column: 1 / -1;">Unable to load projects. Check your Cloudinary settings.</p>';
+            }
+        }
+
+        /* ============================================
+           DRAW GEOMETRIC SHAPES (BACKGROUND)
+           ============================================
+           Creates SVG shapes that float in the background.
+           SVG = Scalable Vector Graphics (math-based shapes,
+           not image files).
+        */
+
+        function drawGeometry() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            /* createElementNS creates SVG elements (special namespace) */
+            
+            svg.setAttribute('viewBox', '0 0 1400 800');
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+
+            // Create gradient (color blend)
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            grad.setAttribute('id', 'archGrad');
+            grad.setAttribute('x1', '0%');
+            grad.setAttribute('y1', '0%');
+            grad.setAttribute('x2', '100%');
+            grad.setAttribute('y2', '100%');
+
+            // Gradient stops (color breakpoints)
+            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.setAttribute('style', 'stop-color:#8b6f47;stop-opacity:0.2');
+            /* Bronze color at 0% with 20% opacity */
+
+            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop2.setAttribute('offset', '100%');
+            stop2.setAttribute('style', 'stop-color:#4a6b9b;stop-opacity:0.2');
+            /* Blue color at 100% with 20% opacity */
+
+            grad.appendChild(stop1);
+            grad.appendChild(stop2);
+            defs.appendChild(grad);
+            svg.appendChild(defs);
+
+            // Draw 5 floating rectangles (architectural forms)
+            for (let i = 0; i < 5; i++) {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', 200 + i * 200);       /* Horizontal position */
+                rect.setAttribute('y', 100 + i * 30);        /* Vertical position */
+                rect.setAttribute('width', 120);             /* Width */
+                rect.setAttribute('height', 400 - i * 40);   /* Height (decreasing) */
+                rect.setAttribute('fill', 'url(#archGrad)');  /* Use gradient we created */
+                rect.setAttribute('opacity', '0.6');          /* 60% visible */
+                
+                /* Apply float animation: takes 3-7 seconds depending on i */
+                rect.style.animation = `float ${3 + i}s ease-in-out infinite`;
+                
+                svg.appendChild(rect);
+            }
+
+            shapesContainer.appendChild(svg);
+        }
+
+        /* ============================================
+           INITIALIZATION (RUNS WHEN PAGE LOADS)
+           ============================================
+           These functions are called once when the page
+           first loads to set everything up.
+        */
+
+        initDots();                    /* Create navigation dots */
+        updateSlides();                /* Show first slide */
+        drawGeometry();                /* Draw background shapes */
+        loadProjectsFromCloudinary();  /* Load images from Cloudinary */
+    </script>
+</body>
+  </html>
